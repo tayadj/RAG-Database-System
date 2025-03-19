@@ -55,4 +55,5 @@ class Engine():
 
 		query_engine = self.index.as_query_engine()
 		response = query_engine.query(query)
-		print(response)
+
+		return response.response
