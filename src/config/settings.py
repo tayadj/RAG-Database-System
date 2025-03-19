@@ -16,7 +16,8 @@ class Settings(pydantic_settings.BaseSettings):
 
 	OPENAI_API_TOKEN: pydantic.SecretStr
 	GOOGLE_SERVICE_ACCOUNT: pydantic.SecretStr
-	GOOGLE_SERVICE_DATABASE_URL: pydantic.SecretStr
+	GOOGLE_DATABASE_URL: pydantic.SecretStr
+	LOCAL_DATABASE_URL: pydantic.SecretStr
 
 	def _GOOGLE_SERVICE_ACCOUNT(self):
 

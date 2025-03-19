@@ -1,15 +1,14 @@
 import asyncio
 import llama_index
 import llama_index.llms.openai
+import llama_index.agent.openai
 import os
 
 class Engine():
 
-	# implement multi-thread
+	# implement multi-thread, connection pool
 
 	class RAGPipeline():
-
-		
 
 		# RAG Strategy 
 
@@ -22,11 +21,11 @@ class Engine():
 
 		self.data = RAG_data
 		self.index = None
-
+		
 		os.environ["OPENAI_API_KEY"] = openai_api_token
 		self.model = llama_index.llms.openai.OpenAI (
 			model = 'gpt-3.5-turbo'
-		)		
+		)
 
 		self.setup_storage()
 
@@ -44,12 +43,16 @@ class Engine():
 			for file in self.data
 			for chunk in file['chunks']
 		] 
-
-		self.index = llama_index.core.GPTVectorStoreIndex.from_documents(documents)
+		# use GPTVectorStoreIndex
+		self.index = llama_index.core.VectorStoreIndex.from_documents(documents)
 
 	async def request(self, query: str):
 
 		# outtage database - ignore
 
-		resp = await self.model.acomplete("Paul Graham is ")
-		print(resp)
+		#resp = await self.model.acomplete("Paul Graham is ")
+		#print(resp)
+
+		query_engine = self.index.as_query_engine()
+		response = query_engine.query(query)
+		print(response)

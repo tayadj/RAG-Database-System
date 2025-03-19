@@ -12,11 +12,13 @@ if __name__ == '__main__':
 
 		settings = config.Settings()
 
-		database = data.Database(settings._GOOGLE_SERVICE_ACCOUNT(), '/storage')
-		RAG_data = await database.local_database.load('database')
+		database = data.Database(settings._GOOGLE_SERVICE_ACCOUNT(), settings.LOCAL_DATABASE_URL.get_secret_value())
 
-		engine = core.service.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), RAG_data)
+		print(await database.google_database.load(settings.GOOGLE_DATABASE_URL.get_secret_value()))
+		#RAG_data = await database.local_database.load('database')
 
-		await engine.request('')
+		#engine = core.service.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), RAG_data)
+
+		#await engine.request('How can I better manage my stock to avoid running out of popular items?')
 
 	asyncio.run(main())
