@@ -39,13 +39,11 @@ class Database:
 				if response.status == 200:
 
 					data = await response.json()
-					print("Data loaded successfully:")
-					print(data)
-					for row in data.get('values', []):
-
-						print(row)
+					data = data.get('values', [])
 
 				else:
 
 					print(f"Failed to load data: {response.status} - {await response.text()}")
+					data = []
 		
+		return data
