@@ -1,6 +1,7 @@
 import asyncio
 import llama_index
 import llama_index.llms.openai
+import os
 
 class Engine():
 
@@ -11,6 +12,10 @@ class Engine():
 		
 
 		# RAG Strategy 
+
+		# Feel free to use statistical methods in order to enhance the metrics
+		# No hallucinations
+
 		pass
 
 	def __init__(self, openai_api_token: str, RAG_data: dict):
@@ -18,13 +23,10 @@ class Engine():
 		self.data = RAG_data
 		self.index = None
 
-		
-		self.openai_api_token = openai_api_token
+		os.environ["OPENAI_API_KEY"] = openai_api_token
 		self.model = llama_index.llms.openai.OpenAI (
-			model = 'gpt-3.5-turbo',
-			api_key = openai_api_token
-		)
-		
+			model = 'gpt-3.5-turbo'
+		)		
 
 		self.setup_storage()
 
@@ -45,6 +47,9 @@ class Engine():
 
 		self.index = llama_index.core.GPTVectorStoreIndex.from_documents(documents)
 
-	def request(self, query: str):
+	async def request(self, query: str):
 
-		pass
+		# outtage database - ignore
+
+		resp = await self.model.acomplete("Paul Graham is ")
+		print(resp)

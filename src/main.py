@@ -17,4 +17,6 @@ if __name__ == '__main__':
 
 		engine = core.service.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), RAG_data)
 
+		await engine.request('')
+
 	asyncio.run(main())
