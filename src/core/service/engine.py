@@ -18,13 +18,13 @@ class Engine():
 		self.data = RAG_data
 		self.index = None
 
-		'''
+		
 		self.openai_api_token = openai_api_token
 		self.model = llama_index.llms.openai.OpenAI (
 			model = 'gpt-3.5-turbo',
 			api_key = openai_api_token
 		)
-		'''
+		
 
 		self.setup_storage()
 
@@ -43,10 +43,7 @@ class Engine():
 			for chunk in file['chunks']
 		] 
 
-		print(documents[:5])
-
 		self.index = llama_index.core.GPTVectorStoreIndex.from_documents(documents)
-		self.index.storage_context.persist(persist_dir = '/storage_context')
 
 	def request(self, query: str):
 
