@@ -5,6 +5,9 @@ __pycache__/
 # IDE files
 .vs/
 
+# Storage files
+*.json
+
 # Environment settings
 .env
 google-service

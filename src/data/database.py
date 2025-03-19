@@ -17,7 +17,6 @@ class Database:
 			scopes = ['https://www.googleapis.com/auth/spreadsheets']
 		)
 
-
 	async def authentificate(self):
 
 		self.request = google.auth.transport.requests.Request()
