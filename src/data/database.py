@@ -1,10 +1,8 @@
 import aiohttp
-import json
-import googleapiclient
 import google.oauth2.service_account
 import google.auth.transport.requests
+import json
 import os
-import pandas
 
 
 
@@ -36,7 +34,12 @@ class Database:
 
 			async with aiohttp.ClientSession() as session:
 
-				async with session.get(url, headers = {'Authorization' : f'Bearer {self.access_token}'}) as response:
+				async with session.get(
+					url, 
+					headers = {
+						'Authorization' : f'Bearer {self.access_token}'
+					}
+				) as response:
 
 					if response.status == 200:
 
@@ -49,6 +52,40 @@ class Database:
 						data = []
 		
 			return data
+
+		async def save(self, url: str, data: list):
+
+			if not self.access_token:
+
+				await self.authentificate()
+				
+			async with aiohttp.ClientSession() as session:
+
+				async with session.put(
+					url,
+					params = {
+						'valueInputOption' : 'RAW'
+					},
+					headers = {
+						'Authorization' : f'Bearer {self.access_token}',
+						'Content-Type': 'application/json'
+					},
+					json = {
+						'range': url.split('/')[-1],
+						'values': data,
+						'majorDimension': 'ROWS'
+					}
+				) as response:
+
+					if response.status == 200:
+
+						result = await response.json()
+
+					else:
+
+						print(f"Failed to save data: {response.status} - {await response.text()}")
+						result = {}
+
 
 	class LocalDatabase:
 

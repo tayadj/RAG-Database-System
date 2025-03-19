@@ -15,6 +15,12 @@ if __name__ == '__main__':
 		database = data.Database(settings._GOOGLE_SERVICE_ACCOUNT(), settings.LOCAL_DATABASE_URL.get_secret_value())
 
 		print(await database.google_database.load(settings.GOOGLE_DATABASE_URL.get_secret_value()))
+		
+		await database.google_database.save(
+			settings.GOOGLE_DATABASE_URL.get_secret_value(),
+			[['', 'test_save'], ['','','','test_save_2']]
+		)
+
 		#RAG_data = await database.local_database.load('database')
 
 		#engine = core.service.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), RAG_data)
