@@ -15,24 +15,18 @@ if __name__ == '__main__':
 		database = data.Database(settings._GOOGLE_SERVICE_ACCOUNT(), settings.LOCAL_DATABASE_URL.get_secret_value())
 		engine = core.services.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), (await database.local_database.load('database')))
 
-		dataframe = (await database.google_database.load(settings.GOOGLE_DATABASE_URL.get_secret_value()))
+		dataframe = (await database.google_database.load(settings.GOOGLE_DATABASE_URL.get_secret_value()))[:10]
+		queries, answers = zip(*[(record[0], record[1]) for record in dataframe])
 
-		queries = []
-		answers = []
+		tasks = [engine.assess([query],[answer]) for query, answer in zip(queries, answers)]
+		results = await asyncio.gather(*tasks)
 
-		for record in dataframe:
+		for record, result in zip(dataframe, results):
 
-			queries.append(record[0])
-			answers.append(record[0])
-
-
-		responses, contexts, scores = await engine.assess(queries, answers)
-
-		for record, response, context, score in zip(dataframe, responses, contexts, scores):
-
-			record.append(response)
-			record.append(json.dumps(context, ensure_ascii = False))
-			record.append(json.dumps(score, ensure_ascii = False))
+			responses, contexts, scores = result
+			record.append(responses[0])
+			record.append(json.dumps(contexts[0], ensure_ascii=False))
+			record.append(json.dumps(scores[0], ensure_ascii=False))
 
 		await database.google_database.save(
 			settings.GOOGLE_DATABASE_URL.get_secret_value(),
