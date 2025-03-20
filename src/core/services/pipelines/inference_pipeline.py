@@ -15,7 +15,9 @@ class InferencePipeline():
 
 	async def process(self, query: str):
 
-		self.engine = await self.retrieve_query_engine(self.index)
+		if self.engine is None:
+
+			self.engine = await self.retrieve_query_engine(self.index)
 
 		context = (await self.retrieve_context(query)).response
 		
@@ -38,7 +40,7 @@ class InferencePipeline():
 
 	async def retrieve_context(self, query):
 
-		return self.engine.query(query)
+		return await self.engine.aquery(query)
 
 	async def retrieve_query_engine(self, index: llama_index.core.VectorStoreIndex, similarity_top: int = 5):
 

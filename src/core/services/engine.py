@@ -24,6 +24,7 @@ class Engine():
 		self.setup_index()
 
 		self.inference_pipeline = core.services.pipelines.InferencePipeline(self.model, self.index)
+		self.assessment_pipeline = core.services.pipelines.AssessmentPipeline(self.model, self.inference_pipeline)
 
 	# rearrange data ingestion strategy to be universal
 
@@ -44,3 +45,9 @@ class Engine():
 		response, context = await self.inference_pipeline.process(query)
 		
 		return response, context
+
+	async def assess(self, queries, answers):
+
+		responses, contexts, scores = await self.assessment_pipeline.process(queries, answers)
+
+		return responses, contexts, scores
