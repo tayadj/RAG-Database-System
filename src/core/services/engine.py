@@ -86,4 +86,4 @@ class Engine():
 		context = await self.RAGPipeline.retrieve_context(query_engine, query)
 		response = await self.RAGPipeline.response(query, context, self.model)
 		
-		return response.text
+		return response.text, [context.response] # case for context as str
