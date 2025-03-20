@@ -16,7 +16,6 @@ if __name__ == '__main__':
 		database = data.Database(settings._GOOGLE_SERVICE_ACCOUNT(), settings.LOCAL_DATABASE_URL.get_secret_value())
 		engine = core.services.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), (await database.local_database.load('database')))
 
-		# assessment = core.services.Assessment()
 		# move to assessment
 
 		evaluator_llm = ragas.llms.LlamaIndexLLMWrapper(engine.model)

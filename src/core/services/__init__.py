@@ -1,2 +1,2 @@
 from .engine import Engine
-from .assessment import Assessment
+from .pipelines import AssessmentPipeline, InferencePipeline

@@ -2,7 +2,8 @@ import ragas
 import json
 
 
-class Assessment:
+
+class AssessmentPipeline():
 
 	def __init__(self, queries: dict, answers: dict, model):
 
@@ -13,11 +14,7 @@ class Assessment:
 		# exceptions
 		# queries and answers must be the same dimension
 
-	def assess_factual_correctness(self):
-
-		pass
-
-	def assess_noise_sensitivity(self):
+	def process(self):
 
 		pass
 		
