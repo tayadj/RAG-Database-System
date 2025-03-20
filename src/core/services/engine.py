@@ -23,6 +23,7 @@ class Engine():
             2. Your response should be detailed and should cover every aspect of the context.
             3. Be crisp and concise.
             4. Try to find correlated information based on context and enhance your response using it.
+			5. In case you haven't found any information from context, your response must be "There is no information on this topic."
             '''
 
 			response = await model.acomplete(prompt)
@@ -85,4 +86,4 @@ class Engine():
 		context = await self.RAGPipeline.retrieve_context(query_engine, query)
 		response = await self.RAGPipeline.response(query, context, self.model)
 		
-		return response
+		return response.text
