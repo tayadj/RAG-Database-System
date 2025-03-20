@@ -6,6 +6,8 @@ import os
 
 
 
+# Rebase databases as access points 
+
 class Database:
 
 	class GoogleDatabase:
@@ -63,9 +65,6 @@ class Database:
 
 				async with session.put(
 					url,
-					params = {
-						'valueInputOption' : 'RAW'
-					},
 					headers = {
 						'Authorization' : f'Bearer {self.access_token}',
 						'Content-Type': 'application/json'
@@ -74,6 +73,9 @@ class Database:
 						'range': url.split('/')[-1],
 						'values': data,
 						'majorDimension': 'ROWS'
+					},
+					params = {
+						'valueInputOption' : 'RAW'
 					}
 				) as response:
 
@@ -85,7 +87,6 @@ class Database:
 
 						print(f"Failed to save data: {response.status} - {await response.text()}")
 						result = {}
-
 
 	class LocalDatabase:
 

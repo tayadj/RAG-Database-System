@@ -10,10 +10,10 @@ class Engine():
 
 	# implement multi-thread, connection pool
 
-	def __init__(self, openai_api_token: str, RAG_data: dict):
+	def __init__(self, openai_api_token: str, data: dict):
 
 
-		self.data = RAG_data
+		self.data = data
 		self.index = None
 		
 		os.environ["OPENAI_API_KEY"] = openai_api_token
