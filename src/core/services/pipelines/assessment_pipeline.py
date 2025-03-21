@@ -35,10 +35,16 @@ class AssessmentPipeline():
 				retrieved_contexts = context
 			)
 
+			print(f"Sample: {sample}\nheader:{header}\n\n\n\n\n")
+
+
+
 			score = {
 				'factual_correctness' : (await self.factual_correctness_scorer.single_turn_ascore(sample)),
 				'noise_sensitivity': (await self.noise_sensitivity_scorer.single_turn_ascore(sample))
 			}
+
+			print(f"Sample score: {score}, query: {query}\n\n\n\n\n\n")
 			scores.append(score)
 
 		return responses, headers, scores

@@ -13,7 +13,8 @@ class InferencePipeline():
 		self.data = data
 
 		self.config = {
-			'similarity_top': config.get('similarity_top', 5)
+			'similarity_top': config.get('similarity_top', 1),
+			'similarity_cutoff': config.get('similarity_cutoff', 0.75)
 		}
 
 		self.documents = None
@@ -34,8 +35,8 @@ class InferencePipeline():
 
 		self.documents = [
 			llama_index.core.Document(
-				text=chunk.get('text', ''),
-				metadata={
+				text = chunk.get('text', ''),
+				metadata = {
 					**chunk.get('metadata', {}), 
 					'header': file['file_path']
 				}
@@ -50,7 +51,10 @@ class InferencePipeline():
 
 	async def setup_retriever(self):
 
-		self.retriever = self.index.as_retriever()
+		self.retriever = self.index.as_retriever(
+			similarity_top_k = self.config.get('similarity_top'),
+			similarity_cutoff = self.config.get('similarity_cutoff')
+		)
 
 	async def setup_engine(self):
 
@@ -58,9 +62,14 @@ class InferencePipeline():
 			target_metadata_key = 'window'
 		)
 
+		similarity_postprocessor = llama_index.core.postprocessor.SimilarityPostprocessor(
+			similarity_cutoff = self.config.get('similarity_cutoff')
+		)
+
 		self.engine = llama_index.core.query_engine.RetrieverQueryEngine(
 			retriever = self.retriever,
 			node_postprocessors = [
+				similarity_postprocessor,
 				metadata_postprocessor
 			]
 		)
@@ -71,6 +80,8 @@ class InferencePipeline():
 		retrieved_headers = [node.node.metadata.get('header', 'Untitled') for node in retrieved_nodes]
 		retrieved_contexts = [node.node.text for node in retrieved_nodes]
 		context = (await self.engine.aquery(query))
+
+		print(f'Inference retrieved contexts: {retrieved_contexts}\n')
 
 		prompt = f'''
 		Using the provided context, generate a comprehensive and informative answer to the query:

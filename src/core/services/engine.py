@@ -22,7 +22,7 @@ class Engine():
 
 	async def request(self, query: str):
 
-		response, _, _ = await self.inference_pipeline.process(query)
+		response, _ = await self.inference_pipeline.process(query)
 		
 		return response
 
