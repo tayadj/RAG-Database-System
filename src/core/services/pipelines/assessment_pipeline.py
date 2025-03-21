@@ -24,6 +24,8 @@ class AssessmentPipeline():
 		for query, answer in zip(queries, answers):
 
 			response, context = await self.inference_pipeline.process(query)
+
+			print(context)
 			responses.append(response)
 			contexts.append(context)
 
