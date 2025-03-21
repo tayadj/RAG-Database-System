@@ -7,6 +7,8 @@ import llama_index.agent.openai
 
 class InferencePipeline():
 
+	# implement anchor for no-context i.e. when there's no information about the question in our index
+
 	def __init__(self, model, index, config = {}):
 
 		self.model = model
