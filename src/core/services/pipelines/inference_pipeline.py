@@ -62,39 +62,7 @@ class InferencePipeline():
 			]
 		)
 
-		'''
-		self.engine = self.index.as_query_engine(
-			similarity_top_k = self.config.get('similarity_top'),
-			node_postprocessors = [
-				metadata_postprocessor
-			]
-		)
-		'''
-
 	async def process(self, query: str):
-
-		"""
-
-		context = (await self.retrieve_context(query)).response
-		
-		prompt = f'''
-		Generate a detailed response for the query asked based only on the context fetched:
-		Query: {query}
-		Context: {context}
-
-		Instructions:
-		1. Show only your generated response based on context.
-		2. Your response should be detailed and should cover every aspect of the context.
-		3. Be crisp and concise.
-		4. Try to find correlated information based on context and enhance your response using it.
-		5. In case you haven't found any information from context, your response must be "There is no information on this topic."
-		'''
-
-		response = (await self.model.acomplete(prompt)).text
-
-
-
-		"""
 
 		retrieved_nodes = (await self.retriever.aretrieve(query))
 		retrieved_contexts = [node.node.text for node in retrieved_nodes]
