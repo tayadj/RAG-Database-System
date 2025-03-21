@@ -4,22 +4,34 @@ import llama_index.llms.openai
 import llama_index.agent.openai
 
 
+'''
+	def setup_index(self):
+
+		'''
+
+
 
 class InferencePipeline():
 
-	# implement anchor for no-context i.e. when there's no information about the question in our index
-
-	def __init__(self, model, index, config = {}):
+	def __init__(self, model, data, config = {}):
 
 		self.model = model
-		self.index = index
+		self.data = data
+		self.config = config
+
+		self.documents = None
+		self.index = None
 		self.engine = None
 
+		asyncio.run(self.setup())
+
+	async def setup(self):
+
+		await self.retrieve_documents()
+		await self.retrieve_index()
+		await self.retrieve_query_engine()
+
 	async def process(self, query: str):
-
-		if self.engine is None:
-
-			self.engine = await self.retrieve_query_engine(self.index)
 
 		context = (await self.retrieve_context(query)).response
 		
@@ -38,23 +50,36 @@ class InferencePipeline():
 
 		response = (await self.model.acomplete(prompt)).text
 
-		return response, [context] # case if context is str
-
+		return response, [context] 
+		
 	async def retrieve_context(self, query):
 
 		return await self.engine.aquery(query)
+		
+	async def retrieve_documents(self):
 
-	async def retrieve_query_engine(self, index: llama_index.core.VectorStoreIndex, similarity_top: int = 5):
+		self.documents = [
+			llama_index.core.Document(
+				text = chunk.get('text',''),
+				metadata = chunk.get('metadata',{})
+			)
+			for file in self.data
+			for chunk in file['chunks']
+		]
+
+	async def retrieve_index(self):
+
+		self.index = llama_index.core.VectorStoreIndex.from_documents(self.documents)
+
+	async def retrieve_query_engine(self):
 
 		postprocessor = llama_index.core.postprocessor.MetadataReplacementPostProcessor(
 			target_metadata_key = 'window'
 		)
 
-		engine = index.as_query_engine(
-			similarity_top_k = similarity_top,
+		self.engine = self.index.as_query_engine(
+			similarity_top_k = self.config.get('similarity_top', 5),
 			node_postprocessors = [
 				postprocessor
 			]
 		)
-
-		return engine
