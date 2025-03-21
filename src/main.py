@@ -13,9 +13,9 @@ if __name__ == '__main__':
 
 		settings = config.Settings()
 		database = data.Database(settings._GOOGLE_SERVICE_ACCOUNT(), settings.LOCAL_DATABASE_URL.get_secret_value())
-		engine = core.services.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), (await database.local_connector.load('database')))
+		engine = core.services.Engine(settings.OPENAI_API_TOKEN.get_secret_value(), (await database.local_connector.load('data')))
 
-		dataframe = (await database.google_connector.load(settings.GOOGLE_DATABASE_URL.get_secret_value()))
+		dataframe = (await database.google_connector.load(settings.GOOGLE_DATABASE_URL.get_secret_value()))[:10]
 		queries, answers = zip(*[(record[0], record[1]) for record in dataframe])
 
 		tasks = [engine.assess([query],[answer]) for query, answer in zip(queries, answers)]

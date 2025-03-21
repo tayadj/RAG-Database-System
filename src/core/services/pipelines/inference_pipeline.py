@@ -14,7 +14,8 @@ class InferencePipeline():
 
 		self.config = {
 			'similarity_top': config.get('similarity_top', 1),
-			'similarity_cutoff': config.get('similarity_cutoff', 0.75)
+			'similarity_cutoff': config.get('similarity_cutoff', 0.75),
+			'retrieve_hybrid_alpha': config.get('retrieve_hybrid_alpha', 0.25)
 		}
 
 		self.documents = None
@@ -53,7 +54,8 @@ class InferencePipeline():
 
 		self.retriever = self.index.as_retriever(
 			similarity_top_k = self.config.get('similarity_top'),
-			similarity_cutoff = self.config.get('similarity_cutoff')
+			similarity_cutoff = self.config.get('similarity_cutoff'),
+			alpha = self.config.get('retrieve_hybrid_alpha')
 		)
 
 	async def setup_engine(self):
@@ -61,10 +63,12 @@ class InferencePipeline():
 		metadata_postprocessor = llama_index.core.postprocessor.MetadataReplacementPostProcessor(
 			target_metadata_key = 'window'
 		)
+		
 
 		similarity_postprocessor = llama_index.core.postprocessor.SimilarityPostprocessor(
 			similarity_cutoff = self.config.get('similarity_cutoff')
 		)
+		
 
 		self.engine = llama_index.core.query_engine.RetrieverQueryEngine(
 			retriever = self.retriever,
@@ -76,12 +80,12 @@ class InferencePipeline():
 
 	async def process(self, query: str):
 
-		retrieved_nodes = (await self.retriever.aretrieve(query))
+		retrieved_nodes = (await self.engine.aretrieve(query))
 		retrieved_headers = [node.node.metadata.get('header', 'Untitled') for node in retrieved_nodes]
 		retrieved_contexts = [node.node.text for node in retrieved_nodes]
-		context = (await self.engine.aquery(query))
+		context = '\n'.join(retrieved_contexts)
 
-		print(f'Inference retrieved contexts: {retrieved_contexts}\n')
+		# llama_index.core.PromptTemplate
 
 		prompt = f'''
 		Using the provided context, generate a comprehensive and informative answer to the query:
@@ -89,10 +93,10 @@ class InferencePipeline():
 		Context: {context}
 
 		Guidelines for your response:
-		1. Your answer must focus exclusively on the given context and must not introduce unrelated information.
-		2. Provide a detailed explanation that thoroughly addresses all aspects of the context relevant to the query.
-		3. Use a structured format, ensuring the response is clear and concise.
-		4. If the context lacks information about the query, reply explicitly with: "There is no information on this topic."
+		1. If the context lacks information about the query, reply explicitly with: "There is no information on this topic."
+		2. Your answer must focus exclusively on the given context and must not introduce unrelated information.
+		3. Provide a detailed explanation that thoroughly addresses all aspects of the context relevant to the query.
+		4. Use a structured format, ensuring the response is clear and concise.
 		'''
 
 		response = (await self.model.acomplete(prompt)).text
