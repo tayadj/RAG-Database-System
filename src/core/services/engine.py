@@ -22,9 +22,9 @@ class Engine():
 
 	async def request(self, query: str):
 
-		response, context = await self.inference_pipeline.process(query)
+		response, _, _ = await self.inference_pipeline.process(query)
 		
-		return response, context
+		return response
 
 	async def assess(self, queries, answers):
 

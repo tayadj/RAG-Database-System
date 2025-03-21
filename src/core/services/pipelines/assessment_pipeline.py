@@ -18,16 +18,15 @@ class AssessmentPipeline():
 	async def process(self, queries, answers):
 
 		responses = []
-		contexts = []
+		headers = []
 		scores = []
 
 		for query, answer in zip(queries, answers):
 
-			response, context = await self.inference_pipeline.process(query)
+			response, context, header = await self.inference_pipeline.process(query)
 
-			print(context)
 			responses.append(response)
-			contexts.append(context)
+			headers.append(header)
 
 			sample = ragas.dataset_schema.SingleTurnSample(
 				user_input = query,
@@ -42,5 +41,5 @@ class AssessmentPipeline():
 			}
 			scores.append(score)
 
-		return responses, contexts, scores
+		return responses, headers, scores
 		
