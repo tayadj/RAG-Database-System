@@ -85,6 +85,7 @@ class InferencePipeline():
 			modules = {
 				'retriever': self.retriever,
 				'reranker': self.reranker,
+				'summarizer': self.summarizer,
 				'instruction': instruction_prompt_template,
 				'model': self.model
 			},
