@@ -18,14 +18,15 @@ class AssessmentPipeline():
 	async def process(self, queries, answers):
 
 		responses = []
-		contexts = []
+		headers = []
 		scores = []
 
 		for query, answer in zip(queries, answers):
 
-			response, context = await self.inference_pipeline.process(query)
+			response, context, header = await self.inference_pipeline.process(query)
+
 			responses.append(response)
-			contexts.append(context)
+			headers.append(header)
 
 			sample = ragas.dataset_schema.SingleTurnSample(
 				user_input = query,
@@ -38,7 +39,10 @@ class AssessmentPipeline():
 				'factual_correctness' : (await self.factual_correctness_scorer.single_turn_ascore(sample)),
 				'noise_sensitivity': (await self.noise_sensitivity_scorer.single_turn_ascore(sample))
 			}
+
+			print(f"Sample: {sample}, header: {header}, query: {query}, score: {score}")
+
 			scores.append(score)
 
-		return responses, contexts, scores
+		return responses, headers, scores
 		
